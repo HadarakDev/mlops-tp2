@@ -1,0 +1,39 @@
+name: CI
+
+# Every push, and every pull request: the data is checked before anything
+# is trained on it, and the pipeline has to run from end to end.
+on: [push, pull_request]
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # data/raw/ is tracked by DVC, and this project's remote is a folder on
+      # the student's own machine: the runner cannot pull it. data/source/ is
+      # the copy Git carries, so that is what the CI validates and trains on.
+      - name: Put the dataset in place
+        run: cp data/source/winequality-red.csv data/raw/
+
+      - name: Validate the raw data
+        run: python src/validate.py --path data/source/winequality-red.csv
+
+      - name: Run the pipeline
+        run: dvc repro --force
+
+      - name: Show the metrics
+        run: dvc metrics show
+
+      # metrics.json comes from the evaluate stage: a model that got worse
+      # turns the job red, even when the data was valid.
+      - name: Fail if the model got worse
+        run: python src/check_f1.py
