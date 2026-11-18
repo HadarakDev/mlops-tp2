@@ -1,0 +1,22 @@
+stages:
+  prepare:
+    cmd: python src/prepare.py
+    deps:
+      - src/prepare.py
+      - data/raw/winequality-red.csv
+    params:
+      - prepare.test_size
+      - prepare.random_state
+    outs:
+      - data/prepared
+
+  train:
+    cmd: python src/train.py
+    deps:
+      - src/train.py
+      - data/prepared
+    params:
+      - train.n_estimators
+      - train.max_depth
+    outs:
+      - models/model.pkl

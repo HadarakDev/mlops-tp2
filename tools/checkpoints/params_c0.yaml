@@ -1,0 +1,9 @@
+prepare:
+  test_size: 0.2
+  random_state: 42
+
+##### cycle 1, etape 3 : remplacez les X par les valeurs ecrites en dur
+##### dans src/train.py
+train:
+  n_estimators: X
+  max_depth: X

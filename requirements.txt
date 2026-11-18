@@ -1,0 +1,17 @@
+# Python 3.12 or newer (numpy 2.5 and scikit-learn 1.9 require it).
+dvc==3.67.1
+mlflow==3.17.1
+pandera==0.34.1
+scikit-learn==1.9.1
+pandas==3.0.6
+numpy==2.5.4
+joblib==1.6.0
+PyYAML==6.0.3
+# Conda environments ship OpenSSL 3.0, which cryptography 49+ no longer supports
+cryptography==48.0.1
+
+# cycle 5: serving the model and measuring what it does
+fastapi==0.162.6
+uvicorn==0.54.0
+prometheus-client==0.26.0
+requests==2.34.2

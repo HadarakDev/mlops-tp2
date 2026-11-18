@@ -1,0 +1,44 @@
+# .github/workflows/ci.yml -- le workflow du TP, a completer au cycle 4
+#
+# Copiez ce fichier a sa place, puis remplissez les trous :
+#
+#     mkdir -p .github/workflows && cp tools/ci.yml .github/workflows/ci.yml
+#
+# Les trois commandes que la CI doit lancer sont celles de tools/ci.sh.
+
+name: CI
+
+##### cycle 4, etape 1 : sur quels evenements ce workflow doit-il tourner ?
+#####   un push suffit-il, si le but est de juger une pull request ?
+on: [ ... ]
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # data/raw/ est suivi par DVC, et le remote de ce projet est un dossier
+      # sur votre machine : le runner GitHub ne peut pas le recuperer.
+      # data/source/ est la copie que Git transporte, elle.
+      ##### cycle 4, etape 1 : mettez le jeu de donnees la ou le pipeline l'attend
+      - name: Put the dataset in place
+        run: ...
+
+      ##### cycle 4, etape 1 : les trois etapes de tools/ci.sh, une par bloc
+      - name: Validate the raw data
+        run: ...
+
+      - name: Run the pipeline
+        run: ...
+
+      - name: Show the metrics
+        run: ...
