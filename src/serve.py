@@ -40,8 +40,12 @@ input_schema = wine_schema.remove_columns(["quality"])
 # A Counter only goes up (calls served). A Histogram sorts values into buckets
 # (how long a call took).
 
-##### cycle 6, etape 1 : declarez ici le compteur d'appels, l'histogramme de
-##### latence et le compteur de predictions par label
+REQUESTS = Counter("wine_requests", "Calls served")
+LATENCY = Histogram(
+    "wine_request_duration_seconds", "Time spent answering a call",
+    buckets=(0.001, 0.0025, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25),
+)
+PREDICTIONS = Counter("wine_predictions", "Predictions served", ["label"])
 
 
 app = FastAPI(title="wine-api")
@@ -92,8 +96,9 @@ def predict(wine: Wine):
     prediction = int(model.predict(df)[0])
     label = "good" if prediction == 1 else "ordinary"
 
-    ##### cycle 6, etape 1 : comptez l'appel, la prediction, et observez la duree
-    ##### (la duree, c'est time.perf_counter() - start)
+    REQUESTS.inc()
+    PREDICTIONS.labels(label).inc()
+    LATENCY.observe(time.perf_counter() - start)
 
     return {"good": prediction, "label": label}
 

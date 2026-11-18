@@ -69,19 +69,15 @@ def main():
     columns = list(reference.columns)
     definition = DataDefinition(numerical_columns=columns)
 
-    ##### cycle 6, etape 2 : remplacez les ... -- le preset DataDriftPreset
-    ##### (method="psi", threshold=PSI_THRESHOLD), puis les deux tableaux :
-    ##### le courant d'abord, la reference ensuite.
     snapshot = Report(
-        metrics=[...]
+        metrics=[DataDriftPreset(method="psi", threshold=PSI_THRESHOLD)]
     ).run(
-        Dataset.from_pandas(..., data_definition=definition),
-        Dataset.from_pandas(..., data_definition=definition),
+        Dataset.from_pandas(current, data_definition=definition),
+        Dataset.from_pandas(reference, data_definition=definition),
     )
 
     REPORT.parent.mkdir(parents=True, exist_ok=True)
-    ##### cycle 6, etape 2 : ecrivez le rapport dans REPORT (save_html attend une chaine)
-    snapshot.save_html(...)
+    snapshot.save_html(str(REPORT))
 
     count, share, drifted = verdict(snapshot)
 
