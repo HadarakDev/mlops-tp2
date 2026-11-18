@@ -83,11 +83,11 @@ def predict(wine: Wine):
     row = {name: getattr(wine, name.replace(" ", "_")) for name in FEATURES}
     df = pd.DataFrame([row])[FEATURES]
 
-    ##### cycle 5, etape 2 : validez df avec input_schema, comme prepare.py le
-    ##### fait avec wine_schema (lazy=True). S'il leve SchemaErrors, refusez le
-    ##### vin : raise HTTPException(status_code=422, detail=...). Pour detail,
-    ##### errors.failure_cases dit quelles colonnes, quels tests et quelles
-    ##### valeurs -- .to_dict("records") le rend lisible en JSON.
+    try:
+        input_schema.validate(df, lazy=True)
+    except SchemaErrors as errors:
+        cases = errors.failure_cases[["column", "check", "failure_case"]]
+        raise HTTPException(status_code=422, detail=cases.to_dict("records"))
 
     prediction = int(model.predict(df)[0])
     label = "good" if prediction == 1 else "ordinary"
