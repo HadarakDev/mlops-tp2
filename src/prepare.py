@@ -3,6 +3,9 @@
 Reads  data/raw/winequality-red.csv
 Writes data/prepared/train.csv and data/prepared/test.csv
 
+The raw data is validated against src/schema.py first: a run stops here
+rather than training on values a wine cannot have.
+
 Parameters come from params.yaml, so that DVC can see them change.
 """
 
@@ -14,6 +17,8 @@ from pathlib import Path
 import pandas as pd
 import yaml
 from sklearn.model_selection import train_test_split
+
+from schema import wine_schema
 
 RAW = Path("data/raw/winequality-red.csv")
 OUT = Path("data/prepared")
@@ -35,6 +40,8 @@ def main():
 
     test_size, random_state = load_params()
     df = pd.read_csv(RAW, sep=";")
+    wine_schema.validate(df)
+    print(f"schema: {len(df)} rows validated")
     df["good"] = (df["quality"] >= 6).astype(int)
     df = df.drop(columns=["quality"])
 
