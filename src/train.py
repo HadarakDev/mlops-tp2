@@ -4,8 +4,7 @@ Reads  data/prepared/train.csv   (produced by src/prepare.py)
 Writes models/model.pkl
 Logs the run to MLflow.
 
-The two settings are still written in the code, where nothing can see them
-change -- and load_params() below is waiting for its key.
+Parameters come from params.yaml, so that DVC can see them change.
 """
 
 print("loading libraries...", flush=True)
@@ -25,7 +24,7 @@ MODEL = Path("models/model.pkl")
 
 
 def load_params():
-    return yaml.safe_load(open("params.yaml"))["X"]
+    return yaml.safe_load(open("params.yaml"))["train"]
 
 
 def main():
@@ -36,10 +35,7 @@ def main():
             "    python src/prepare.py"
         )
 
-    ##### cycle 1, etape 3 : ces deux valeurs doivent venir de params.yaml.
-    ##### load_params() est ecrite juste au-dessus -- il lui manque sa cle.
-    params = {"n_estimators": 100, "max_depth": 4}
-
+    params = load_params()
     df = pd.read_csv(TRAIN)
     X = df.drop(columns=["good"])
     y = df["good"]

@@ -1,15 +1,32 @@
-# dvc.yaml -- le pipeline du TP, a ecrire au cycle 1
-#
-# Un stage se declare ainsi. Retirez le "# " de chaque ligne : l'indentation
-# qui reste est la bonne. Puis remplacez les <...>.
-#
-# stages:
-#   <nom du stage>:
-#     cmd: <la commande a lancer>
-#     deps:
-#       - <le script>
-#       - <le fichier qu'il lit>
-#     outs:
-#       - <ce qu'il ecrit>
+stages:
+  prepare:
+    cmd: python src/prepare.py
+    deps:
+      - src/prepare.py
+      - data/raw/winequality-red.csv
+    params:
+      - prepare.test_size
+      - prepare.random_state
+    outs:
+      - data/prepared
 
-##### cycle 1, etape 1 : ecrivez votre premier stage ci-dessous
+  train:
+    cmd: python src/train.py
+    deps:
+      - src/train.py
+      - data/prepared
+    params:
+      - train.n_estimators
+      - train.max_depth
+    outs:
+      - models/model.pkl
+
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+      - src/evaluate.py
+      - models/model.pkl
+      - data/prepared
+    metrics:
+      - metrics.json:
+          cache: false
